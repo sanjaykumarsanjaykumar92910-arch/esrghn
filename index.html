@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ElectroLab — AC & DC Circuit Simulator</title>
+
+<style>
+/* =========================================================
+   ELECTROLAB - AC & DC CIRCUIT SIMULATOR
+   THEME: DARK NAVY + DEEP PURPLE
+   ========================================================= */
+
+:root {
+    color-scheme: dark;
+    --bg: #080811;
+    --main-bg: #1e1e38;
+    --panel: #0f172a;
+    --panel2: #101724;
+    --card: #1a2234;
+    --card2: #141d2f;
+    --line: #334155;
+    --text: #f1f5f9;
+    --text-sec: #cbd5e1;
+    --muted: #94a3b8;
+    --cyan: #38bdf8;
+    --cyan-soft: #7dd3fc;
+    --blue: #818cf8;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #fb7185;
+    --orange: #f59e0b;
+    --shadow: 0 12px 30px rgba(0, 0, 0, 0.42);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+}
+
+body {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.09), transparent 42%),
+        radial-gradient(ellipse at 12% 85%, rgba(91,33,182,0.13), transparent 38%),
+        radial-gradient(ellipse at 92% 15%, rgba(30,64,175,0.12), transparent 35%),
+        linear-gradient(135deg, var(--bg), var(--main-bg) 52%, var(--bg));
+    background-attachment: fixed;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 64px 1fr;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    align-items: center;
+    padding: 0 18px;
+    background: linear-gradient(145deg, rgba(26,34,52,0.97), rgba(20,29,47,0.97));
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.42);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logoIcon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    background: linear-gradient(135deg, #38bdf8, #075985);
+    box-shadow: 0 0 25px rgba(56,189,248,0.28);
+}
+
+.logoText {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: .3px;
+}
+
+.logoText span {
+    color: var(--cyan);
+}
+
+.headerCenter {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modeButton {
+    border: 1px solid var(--line);
+    background: rgba(15,23,42,0.6);
+    color: var(--muted);
+    padding: 9px 20px;
+    border-radius: 9px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.modeButton:hover {
+    color: white;
+}
+
+.modeButton.active {
+    color: white;
+    border-color: rgba(56,189,248,0.5);
+    background: rgba(56,189,248,0.1);
+    box-shadow: 0 0 20px rgba(56,189,248,0.08);
+}
+
+.headerActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.iconButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: linear-gradient(135deg, #164e70, #1e3a5f);
+    color: var(--text-sec);
+    transition: .2s;
+}
+
+.iconButton:hover {
+    color: white;
+    border-color: var(--cyan);
+    background: linear-gradient(135deg, #036b9b, #164e70);
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(56,189,248,0.2);
+}
+
+/* ================= MAIN ================= */
+
+.main {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 235px minmax(450px,1fr) 300px;
+}
+
+/* ================= LEFT TOOLBOX ================= */
+
+.sidebar {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 15px 12px;
+    background: linear-gradient(160deg, rgba(15,23,42,0.8), rgba(8,8,17,0.8));
+    border-right: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+}
+
+.sidebar::-webkit-scrollbar,
+.rightPanel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.rightPanel::-webkit-scrollbar-thumb {
+    background: #334e68;
+    border-radius: 8px;
+}
+
+.sectionTitle {
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin: 14px 5px 8px;
+}
+
+.toolboxCard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 7px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.sourceTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+
+.sourceTab {
+    padding: 8px;
+    text-align: center;
+    border-radius: 7px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sourceTab.active {
+    background: rgba(56,189,248,0.1);
+    color: var(--cyan);
+}
+
+.component {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 57px;
+    margin-bottom: 7px;
+    padding: 7px 9px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    transition: .18s;
+}
+
+.component:hover {
+    transform: translateX(2px);
+    background: var(--main-bg);
+    border-color: rgba(56,189,248,0.38);
+    box-shadow: inset 0 0 15px rgba(56,189,248,0.05);
+}
+
+.component:active {
+    cursor: grabbing;
+}
+
+.componentIcon {
+    width: 43px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid rgba(56,189,248,0.2);
+    color: var(--cyan-soft);
+}
+
+.componentIcon svg {
+    width: 34px;
+    height: 34px;
+    overflow: visible;
+}
+
+.componentName {
+    font-size: 11px;
+    font-weight: 750;
+    color: var(--text);
+}
+
+.componentInfo {
+    margin-top: 3px;
+    font-size: 9px;
+    color: var(--muted);
+}
+
+/* ================= WORKSPACE ================= */
+
+.workspace {
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+    display: grid;
+    grid-template-rows: 48px 1fr 65px;
+    background:
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,0.8) 1px, transparent 2px),
+        radial-gradient(circle at 78% 18%, rgba(125,211,252,0.85) 1px, transparent 2px),
+        radial-gradient(circle at 62% 78%, rgba(255,255,255,0.75) 1px, transparent 2px),
+        radial-gradient(circle at 32% 72%, rgba(56,189,248,0.8) 1px, transparent 2px),
+        radial-gradient(ellipse at 50% 45%, rgba(56,189,248,0.16), transparent 58%),
+        linear-gradient(135deg, #080811, #171d38 52%, #0b1020);
+    box-shadow: inset 0 0 42px rgba(56,189,248,0.08);
+}
+
+.workspaceTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-bottom: 1px solid rgba(56,189,248,0.38);
+    background: rgba(8,8,17,0.9);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+}
+
+.workspaceTitle {
+    font-size: 12px;
+}
+
+.workspaceTitle strong {
+    color: var(--text);
+}
+
+.workspaceTools {
+    display: flex;
+    gap: 5px;
+}
+
+.smallTool {
+    width: 31px;
+    height: 29px;
+    border: 1px solid #38617f;
+    background: linear-gradient(135deg, #164e70, #1e293b);
+    color: var(--text);
+    border-radius: 7px;
+}
+
+.smallTool:hover {
+    background: #036b9b;
+    border-color: var(--cyan);
+}
+
+.canvasWrap {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#circuitCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: default;
+}
+
+.canvasMessage {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: .8;
+}
+
+.canvasMessage.hidden {
+    display: none;
+}
+
+.canvasMessage .big {
+    font-size: 45px;
+    opacity: .5;
+}
+
+.canvasMessage h2 {
+    margin: 8px 0 4px;
+    font-size: 20px;
+    color: var(--cyan-soft);
+}
+
+.canvasMessage p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.bottomBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(160deg, rgba(15,23,42,0.98), rgba(8,8,17,0.98));
+    border-top: 1px solid var(--line);
+}
+
+.controlGroup {
+    display: flex;
+    gap: 7px;
+}
+
+.runButton,
+.controlBtn {
+    border: 1px solid #38617f;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #164e70, #1e3a5f);
+    color: #f8fafc;
+    height: 37px;
+    transition: 0.2s ease;
+}
+
+.runButton:hover, .controlBtn:hover {
+    background: linear-gradient(135deg, #036b9b, #164e70);
+    border-color: var(--cyan);
+    box-shadow: 0 0 15px rgba(56,189,248,0.2);
+}
+
+.runButton {
+    padding: 0 15px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.runButton.running {
+    color: #07131f;
+    background: var(--green);
+    border-color: var(--green);
+}
+
+.controlBtn {
+    width: 37px;
+    font-size: 15px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.statusDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+}
+
+.statusDot.running {
+    background: var(--green);
+    box-shadow: 0 0 12px rgba(52,211,153,.8);
+}
+
+/* ================= RIGHT PANEL ================= */
+
+.rightPanel {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 13px;
+    background: linear-gradient(160deg, rgba(15,23,42,0.98), rgba(8,8,17,0.98));
+    border-left: 1px solid var(--line);
+    box-shadow: -12px 0 36px rgba(0,0,0,0.28);
+}
+
+.panel {
+    margin-bottom: 10px;
+    padding: 14px;
+    background: linear-gradient(145deg, rgba(26,34,52,0.97), rgba(20,29,47,0.97));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.panelTitle {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--cyan);
+}
+
+.live {
+    color: var(--green);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.measureGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+
+.measureBox {
+    padding: 12px 6px;
+    text-align: center;
+    background: rgba(15,23,42,.7);
+    border: 1px solid rgba(56,189,248,.25);
+    border-radius: 11px;
+}
+
+.measureLabel {
+    color: var(--text-sec);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.measureValue {
+    margin-top: 7px;
+    font-size: 16px;
+    font-weight: 850;
+    color: var(--cyan);
+}
+
+.measureBox:nth-child(2) .measureValue {
+    color: var(--green);
+}
+
+.measureBox:nth-child(3) .measureValue {
+    color: var(--yellow);
+}
+
+.measureBox:nth-child(4) .measureValue {
+    color: var(--orange);
+}
+
+.settingGroup {
+    margin-bottom: 13px;
+}
+
+.settingTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.settingTop span:last-child {
+    color: var(--cyan);
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--cyan);
+    cursor: pointer;
+}
+
+.settingInput {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(56,189,248,.3);
+    border-radius: 7px;
+    outline: none;
+    background: rgba(8,8,17,.75);
+    color: var(--cyan-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.settingInput:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(56,189,248,.15);
+}
+
+.propertyEmpty {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.propertyRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 9px 0;
+    color: var(--text-sec);
+    font-size: 10px;
+}
+
+.propertyRow strong {
+    color: var(--cyan);
+}
+
+.propertyButton {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: rgba(56,189,248,.1);
+    color: var(--cyan);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.propertyButton:hover {
+    background: rgba(56,189,248,.2);
+}
+
+.wavePanel {
+    margin-bottom: 10px;
+}
+
+#waveCanvas {
+    display: block;
+    width: 100%;
+    height: 90px;
+}
+
+/* ================= MODAL ================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modalContent {
+    width: min(500px, 95vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: linear-gradient(145deg, #1a2234, #101724);
+    box-shadow: var(--shadow);
+}
+
+.modalContent h2 {
+    margin-top: 0;
+    color: var(--cyan);
+    font-size: 18px;
+}
+
+.modalContent h3 {
+    margin: 18px 0 7px;
+    font-size: 12px;
+    color: var(--text);
+}
+
+.modalContent p,
+.modalContent li {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.modalClose {
+    float: right;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 22px;
+}
+
+/* ================= FULLSCREEN ================= */
+
+.canvasWrap:fullscreen {
+    background: #080811;
+}
+
+.simulatorPseudoFullscreen .workspace {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    grid-template-rows: 48px 1fr 65px;
+}
+
+.simulatorPseudoFullscreen .workspaceTop,
+.simulatorPseudoFullscreen .bottomBar {
+    display: flex;
+}
+
+.simulatorFullscreen .sidebar,
+.simulatorFullscreen .rightPanel,
+.simulatorFullscreen .header {
+    display: none !important;
+}
+
+.simulatorFullscreen .main {
+    display: block;
+}
+
+.simulatorFullscreen .workspace {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+@media(max-width:900px) {
+    .main {
+        grid-template-columns: 180px minmax(300px,1fr);
+    }
+    .rightPanel {
+        display: none;
+    }
+    .header {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media(max-width:600px) {
+    .main {
+        grid-template-columns: 110px minmax(200px,1fr);
+    }
+    .sidebar {
+        padding: 8px 5px;
+    }
+    .component {
+        flex-direction: column;
+        text-align: center;
+        padding: 6px;
+    }
+    .componentName {
+        font-size: 9px;
+    }
+    .componentInfo {
+        display: none;
+    }
+    .header {
+        padding: 0 8px;
+    }
+    .logoText {
+        font-size: 15px;
+    }
+    .modeButton {
+        padding: 8px;
+        font-size: 9px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="header">
+    <div class="logo">
+        <div class="logoIcon">⚡</div>
+        <div class="logoText">Electro<span>Lab</span></div>
+    </div>
+
+    <div class="headerCenter">
+        <button class="modeButton active" id="dcMode">🔋 DC LAB</button>
+        <button class="modeButton" id="acMode">〰 AC LAB</button>
+    </div>
+
+    <div class="headerActions">
+        <button class="iconButton" onclick="openHelp()" title="Help">?</button>
+        <button class="iconButton" onclick="saveCircuit()" title="Save">💾</button>
+        <button class="iconButton" onclick="loadCircuit()" title="Load">📁</button>
+        <button class="iconButton" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+    </div>
+</header>
+
+<main class="main">
+
+<aside class="sidebar">
+
+    <div class="sectionTitle">Power Sources</div>
+
+    <div class="toolboxCard">
+        <div class="sourceTabs">
+            <div class="sourceTab active" id="sourceDC">🔋 DC Source</div>
+            <div class="sourceTab" id="sourceAC">〰 AC Source</div>
+        </div>
+    </div>
+
+    <div class="sectionTitle">Passive Components</div>
+
+    <div class="component" draggable="true" data-type="resistor">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 20 H7 L11 12 L17 28 L23 12 L29 28 L33 20 H38"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Resistor</div>
+            <div class="componentInfo">Resistance</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="capacitor">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 20 H15 M15 8 V32 M25 8 V32 M25 20 H38"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Capacitor</div>
+            <div class="componentInfo">Capacitance</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="inductor">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 20 H6 C6 8 14 8 14 20 C14 8 22 8 22 20 C22 8 30 8 30 20 H38"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Inductor</div>
+            <div class="componentInfo">Inductance</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="diode">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 20 H12 M12 10 L28 20 L12 30 Z M28 9 V31 M28 20 H38"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Diode</div>
+            <div class="componentInfo">Rectifier</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="bulb">
+        <div class="componentIcon">💡</div>
+        <div>
+            <div class="componentName">Bulb</div>
+            <div class="componentInfo">Light Source</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="switch">
+        <div class="componentIcon">🔘</div>
+        <div>
+            <div class="componentName">Switch</div>
+            <div class="componentInfo">Open / Closed</div>
+        </div>
+    </div>
+
+    <div class="sectionTitle">Measurement</div>
+
+    <div class="component" draggable="true" data-type="ammeter">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M2 20 H9 M31 20 H38"/>
+                <circle cx="20" cy="20" r="11"/>
+                <text x="20" y="24" font-size="12" text-anchor="middle" fill="currentColor" stroke="none">A</text>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Ammeter</div>
+            <div class="componentInfo">Current Meter</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="voltmeter">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M2 20 H9 M31 20 H38"/>
+                <circle cx="20" cy="20" r="11"/>
+                <text x="20" y="24" font-size="12" text-anchor="middle" fill="currentColor" stroke="none">V</text>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Voltmeter</div>
+            <div class="componentInfo">Voltage Meter</div>
+        </div>
+    </div>
+
+    <div class="component" draggable="true" data-type="ground">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M20 5 V20 M8 20 H32 M12 25 H28 M16 30 H24"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Ground</div>
+            <div class="componentInfo">Reference Node</div>
+        </div>
+    </div>
+
+    <div class="sectionTitle">Utilities</div>
+
+    <div class="component" draggable="true" data-type="wire">
+        <div class="componentIcon">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 30 L37 10"/>
+                <circle cx="3" cy="30" r="2" fill="currentColor"/>
+                <circle cx="37" cy="10" r="2" fill="currentColor"/>
+            </svg>
+        </div>
+        <div>
+            <div class="componentName">Wire</div>
+            <div class="componentInfo">Connection</div>
+        </div>
+    </div>
+
+</aside>
+
+<section class="workspace">
+
+    <div class="workspaceTop">
+        <div class="workspaceTitle">
+            🧪 <strong>Virtual Circuit Construction Lab</strong>
+            <span style="color:#718aa0;margin-left:8px;">Click or Drag to Connect • Spacebar to Run</span>
+        </div>
+
+        <div class="workspaceTools">
+            <button class="smallTool" onclick="zoomIn()">+</button>
+            <button class="smallTool" onclick="zoomOut()">−</button>
+            <button class="smallTool" onclick="resetZoom()">100%</button>
+            <button class="smallTool" onclick="clearCircuit()">▤</button>
+        </div>
+    </div>
+
+    <div class="canvasWrap" id="canvasWrap">
+        <canvas id="circuitCanvas"></canvas>
+
+        <div class="canvasMessage" id="emptyMessage">
+            <div class="big">⚡</div>
+            <h2>Build Your Circuit</h2>
+            <p>Drag components from the toolbox to begin</p>
+        </div>
+    </div>
+
+    <div class="bottomBar">
+        <div class="controlGroup">
+            <button class="runButton" id="runButton" onclick="toggleSimulation()">▶ START SIMULATION</button>
+            <button class="controlBtn" onclick="stepSimulation()" title="Step">⏭</button>
+            <button class="controlBtn" onclick="resetSimulation()" title="Reset">↻</button>
+        </div>
+
+        <div class="status">
+            <span class="statusDot" id="statusDot"></span>
+            <span id="statusText">Simulation stopped</span>
+        </div>
+    </div>
+
+</section>
+
+<aside class="rightPanel">
+
+    <div class="panel">
+        <div class="panelHeader">
+            <div class="panelTitle">📊 Measurements</div>
+            <div class="live">● LIVE</div>
+        </div>
+
+        <div class="measureGrid">
+            <div class="measureBox">
+                <div class="measureLabel">Voltage (Voltmeter)</div>
+                <div class="measureValue" id="voltageRead">0.00 V</div>
+            </div>
+
+            <div class="measureBox">
+                <div class="measureLabel">Current (Ammeter)</div>
+                <div class="measureValue" id="currentRead">0.0000 A</div>
+            </div>
+
+            <div class="measureBox">
+                <div class="measureLabel">Power</div>
+                <div class="measureValue" id="powerRead">0.000 W</div>
+            </div>
+
+            <div class="measureBox">
+                <div class="measureLabel">Impedance</div>
+                <div class="measureValue" id="impedanceRead">0.00 Ω</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panelHeader">
+            <div class="panelTitle">⚡ Source Settings</div>
+        </div>
+
+        <div class="settingGroup">
+            <div class="settingTop">
+                <span>Voltage (V)</span>
+            </div>
+
+            <input class="settingInput" type="number" id="voltageCustomInput" value="12" min="0" max="100" onchange="setCustomVoltage(this.value)">
+
+            <input type="range" id="voltageSlider" min="0" max="100" value="12">
+        </div>
+
+        <div class="settingGroup">
+            <div class="settingTop">
+                <span>Frequency</span>
+                <span id="frequencyValue">50 Hz</span>
+            </div>
+            <input type="range" id="frequencySlider" min="1" max="100" value="50">
+        </div>
+
+        <div class="settingGroup">
+            <div class="settingTop">
+                <span>Phase</span>
+                <span id="phaseValue">0°</span>
+            </div>
+            <input type="range" id="phaseSlider" min="0" max="360" value="0">
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panelHeader">
+            <div class="panelTitle">⚙ Component Properties</div>
+        </div>
+        <div id="componentProperties" class="propertyEmpty">
+            Select an apparatus in the simulator.
+        </div>
+    </div>
+
+    <div class="panel wavePanel">
+        <div class="panelHeader">
+            <div class="panelTitle">〰 Signal Waveform</div>
+        </div>
+        <canvas id="waveCanvas"></canvas>
+    </div>
+
+</aside>
+
+</main>
+</div>
+
+<div class="modal" id="helpModal">
+<div class="modalContent">
+    <button class="modalClose" onclick="closeHelp()">×</button>
+    <h2>⚡ ElectroLab — How to Use</h2>
+
+    <h3>How to use</h3>
+    <ol style="color:#9bb0c3;line-height:1.8">
+        <li>Drag an apparatus from the left toolbox.</li>
+        <li><strong>Click a terminal on one component (or wire end), then click another terminal to auto-connect a wire!</strong></li>
+        <li>You can manually drag wire endpoints to snap to terminals or other wires.</li>
+        <li>Drag the ↻ handle to rotate a component.</li>
+        <li>Use the Remove button or Delete key to remove components.</li>
+        <li>Press START SIMULATION.</li>
+    </ol>
+
+    <h3>Keyboard</h3>
+    <p style="color:#9bb0c3;line-height:1.8">
+        Delete / Backspace → Remove selected<br>
+        Space → Start / pause simulation<br>
+        R → Reset simulation<br>
+        Q → Rotate left<br>
+        E → Rotate right<br>
+        Escape → Deselect
+    </p>
+</div>
+</div>
+
+<script>
